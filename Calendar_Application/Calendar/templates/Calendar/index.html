@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'calendar.css' %}">
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            <button id="prev-month">Prev</button>
+            <h2 id="month-year">January</h2>
+            <button id="next-month">Next</button>
+        </div>
+        <div class="calendar-grid">
+            <div class="day">
+                <div class="day-name">Sun</div>
+                <div class="calendar-day">
+                    {% for event in event_list.0 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Mon</div>
+                <div class="calendar-day">
+                    {% for event in event_list.1 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Tue</div>
+                <div class="calendar-day">
+                    {% for event in event_list.2 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Wed</div>
+                <div class="calendar-day">
+                    {% for event in event_list.3 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Thu</div>
+                <div class="calendar-day">
+                    {% for event in event_list.4 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Fri</div>
+                <div class="calendar-day">
+                    {% for event in event_list.5 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-name">Sat</div>
+                <div class="calendar-day">
+                    {% for event in event_list.6 %}
+                        <p>{{ event }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+    </div>
+    <script src="{% static 'calendar.js' %}"></script>
+</body>
+</html>
