@@ -1,6 +1,12 @@
 let dayNamesShown = document.getElementsByClassName('day-name');
+let events = document.getElementsByTagName('p');
 let dayBodies = document.getElementsByClassName('calendar-day');
 let monthyear = document.getElementById('month-year');
+
+const data = document.currentScript.dataset;
+let eventList = data.eventList;
+alert(eventList);
+
 
 let today = new Date();
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -20,11 +26,9 @@ for (let i=0; i<dayNamesShown.length; i++) {
 
 // Add event listener for each day
 for (let i=0; i<dayBodies.length; i++) {
-    dayBodies[i].addEventListener('click', function() { dayClick(i) });
+    events[i].addEventListener('click', function() { eventClick(i) });
 }
 
-// Technically super vulnerable to XSS
-// I'll fix it later
-function dayClick(i) {
-    dayBodies[i].innerHTML = "<p>" + (prompt("Enter event") || "test") + "</p>";
+
+function eventClick(i) {
 }
