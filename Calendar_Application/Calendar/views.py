@@ -4,43 +4,81 @@ from django.template import loader
 from .models import Question, Event
 from django.utils import timezone
 
-def index(request, date_begin, date_end):
+def index(request, date, view):
+    if view == "year":
+        # Make sure date only contains a year
+        try:
+            date = timezone.datetime.strptime(date, "%Y")
+        except:
+            return HttpResponse("Invalid date format. Please use the format YYYY.")
+        
+        # Don't need to check for events if we're looking at a year
+    elif view == "month":
+        # Make sure date only contains a year and month
+        try:
+            date = timezone.datetime.strptime(date, "%Y-%m")
+        except:
+            return HttpResponse("Invalid date format. Please use the format YYYY-MM.")
+
+        # Only need to check for 1 event per day if we're looking at a month
+    elif view == "week":
+        # Make sure date only contains a year, month, and day of beginning of the week
+        try:
+            # Make sure date is formatted properly
+            date = timezone.datetime.strptime(date, "%Y-%m-%d")
+
+            # Make sure date is the beginning of the week
+            if date.weekday() != 6:
+                return HttpResponse("Invalid date. Please use the beginning of the week (Sunday) in the format YYYY-MM-DD.")
+        except:
+            return HttpResponse("Invalid date format. Please use the format YYYY-MM-DD.")
+
+        # Show all events for the week
+        event_list = requestEventDateRange(date, date + timezone.timedelta(days=6))
+    elif view == "day":
+        # Make sure date only contains a year, month, and day
+        try:
+            date = timezone.datetime.strptime(date, "%Y-%m-%d")
+        except:
+            return HttpResponse("Invalid date format. Please use the format YYYY-MM-DD.")
+        
+        # Show all events for the day
+        event_list = requestEventDateRange(date, date)
+        
+    else:
+        return HttpResponse("Invalid view. Please use 'day', 'week', 'year', or 'month'.")
+
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
 
-    # Validate date format
-    try:
-        date_begin = timezone.datetime.strptime(date_begin, "%Y-%m-%d")
-        date_end = timezone.datetime.strptime(date_end, "%Y-%m-%d")
-    except:
-        return HttpResponse("Invalid date format. Please use the format YYYY-MM-DD")
 
 
-    # Create array of arrays to store events for each day of the week
-    event_list = []
-    for i in range(7):
-        event_list.append([])
-    
-    # Get the current day of the week adjusting values to make sunday 0 and saturday 6
-    current_week_day = 0 if timezone.datetime.weekday(timezone.datetime.now()) + 1 == 7 else timezone.datetime.weekday(timezone.datetime.now()) + 1
-
-
-    # Add events for before, the current day, and after
-    for i in range(current_week_day + 1):
-        event_list[i] = [f"{e.event_name} ({e.event_start_time}-{e.event_end_time})" for e in (Event.objects.filter(event_date=timezone.datetime.now() - timezone.timedelta(days=current_week_day - i)))]
-    #event_list[current_week_day] = [f"{e.event_name} ({e.event_start_time}-{e.event_end_time})" for e in (Event.objects.filter(event_date=timezone.datetime.now()))]
-    for i in range(6 - current_week_day):
-        event_list[current_week_day + i + 1] = [f"{e.event_name} ({e.event_start_time}-{e.event_end_time})" for e in (Event.objects.filter(event_date=timezone.datetime.now() + timezone.timedelta(days=i + 1)))]
-
-
-    
-
-
+    # Temporary
+    first=list(event_list.keys())[0]
     template = loader.get_template("Calendar/index.html")
     context = {
         "latest_question_list": latest_question_list,
         "event_list": event_list,
+        "first": first,
     }
     return HttpResponse(template.render(context, request))
+
+
+def requestEventDateRange(date_begin, date_end):
+    # Create object to store events
+    event_list = {
+    #   "2024-01-01": [event1, event2, etc.],
+    #   "2024-01-02": [event1, event2, etc.],
+    }
+
+    # Get all events between the two dates
+    # NOTE: Requesting many events could slow down the server
+    for i in range((date_end - date_begin).days + 1):
+        event_date = date_begin + timezone.timedelta(days=i)
+        events = list(Event.objects.filter(event_date=event_date))
+        #if events:
+        print("EVENTS:", events)
+        event_list[event_date.strftime("%Y-%m-%d")] = events
+    return event_list
 
 
 def detail(request, question_id):
