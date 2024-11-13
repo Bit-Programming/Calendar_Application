@@ -96,8 +96,7 @@ def requestEventDateRange(date_begin, date_end):
 def event_details_ajax(request, event_id):
     # Get the event object by ID
     event = Event.objects.filter(id=event_id).first()
-    print("EVENT:", event)
-
+    
     if event:
         # Return event data as JSON
         data = {
@@ -108,7 +107,6 @@ def event_details_ajax(request, event_id):
         return JsonResponse(data)
     else:
         return JsonResponse({'error': 'Event not found'}, status=404)
-
 
 
 """

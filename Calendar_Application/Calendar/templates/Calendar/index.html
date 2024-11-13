@@ -11,7 +11,7 @@
     <div class="calendar">
         <div class="calendar-header">
             <button id="prev-month">Prev</button>
-            <h2 id="month-year">{{ date|date:"F Y" }}</h2>
+            <h2 id="month-year">{{ event_list.0.date }} FIX THIS</h2>
             <button id="next-month">Next</button>
         </div>
 
@@ -21,7 +21,7 @@
                     <div class="day-name">{{ day.weekday }} <i>({{ day.date }})</i></div>
                     <div class="calendar-day">
                         {% for event in day.events %}
-                            <p class="event-link" data-event-id="{{ event.id }}"><b>{{ event }} {{ event.id }}</b></p> <!-- Assuming Event has a 'name' field -->
+                            <p class="event" data-event-id="{{ event.id }}"><b>{{ event }}</b></p> <!-- Assuming Event has a 'name' field -->
                         {% empty %}
                             <p><i>No events</i></p>
                         {% endfor %}
@@ -45,7 +45,7 @@
 
     <script>
         // Event listener to open modal
-        document.querySelectorAll('.event-link').forEach(function(link) {
+        document.querySelectorAll('.event').forEach(function(link) {
             link.addEventListener('click', function(event) {
                 var eventId = this.getAttribute('data-event-id');
                 console.log("Event ID: ", eventId);
