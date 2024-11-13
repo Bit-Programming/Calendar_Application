@@ -11,67 +11,78 @@
     <div class="calendar">
         <div class="calendar-header">
             <button id="prev-month">Prev</button>
-            <h2 id="month-year">January</h2>
+            <h2 id="month-year">{{ date|date:"F Y" }}</h2>
             <button id="next-month">Next</button>
         </div>
+
         <div class="calendar-grid">
-            <div class="day">
-                <div class="day-name">Sun {{ first }}</div>
-                <div class="calendar-day">
-                    {% for event in event_list.0 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
+            {% for day in event_list %}
+                <div class="day">
+                    <div class="day-name">{{ day.weekday }} <i>({{ day.date }})</i></div>
+                    <div class="calendar-day">
+                        {% for event in day.events %}
+                            <p class="event-link" data-event-id="{{ event.id }}"><b>{{ event }} {{ event.id }}</b></p> <!-- Assuming Event has a 'name' field -->
+                        {% empty %}
+                            <p><i>No events</i></p>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Mon</div>
-                <div class="calendar-day">
-                    {% for event in event_list.1 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Tue</div>
-                <div class="calendar-day">
-                    {% for event in event_list.2 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Wed</div>
-                <div class="calendar-day">
-                    {% for event in event_list.3 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Thu</div>
-                <div class="calendar-day">
-                    {% for event in event_list.4 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Fri</div>
-                <div class="calendar-day">
-                    {% for event in event_list.5 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="day">
-                <div class="day-name">Sat</div>
-                <div class="calendar-day">
-                    {% for event in event_list.6 %}
-                        <p>{{ event }}</p>
-                    {% endfor %}
-                </div>
-            </div>
+            {% endfor %}
+        </div>
     </div>
     <script src="{% static 'calendar.js' %}" data-event-list="{{ event_list }}"></script>
+
+
+    <!-- Modal for event details -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="event-name"></h2>
+            <p><strong>Date:</strong> <span id="event-date"></span></p>
+            <p><strong>Description:</strong> <span id="event-description"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Event listener to open modal
+        document.querySelectorAll('.event-link').forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                var eventId = this.getAttribute('data-event-id');
+                console.log("Event ID: ", eventId);
+                
+                // Make an AJAX request to get event details
+                fetch(`/Calendar/event/ajax/${eventId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                        } else {
+                            // Populate modal with event details
+                            document.getElementById('event-name').innerText = data.name;
+                            document.getElementById('event-date').innerText = data.event_date;
+                            document.getElementById('event-description').innerText = data.description;
+
+                            // Show the modal
+                            document.getElementById('event-modal').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching event details:', error);
+                    });
+            });
+        });
+
+        // Close the modal
+        document.querySelector('.close-btn').addEventListener('click', function() {
+            document.getElementById('event-modal').style.display = 'none';
+        });
+
+        // Close modal if clicked outside the content area
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('event-modal')) {
+                document.getElementById('event-modal').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

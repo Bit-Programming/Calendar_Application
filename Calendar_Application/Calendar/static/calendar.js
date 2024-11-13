@@ -1,3 +1,5 @@
+/*
+
 let dayNamesShown = document.getElementsByClassName('day-name');
 let events = document.getElementsByTagName('p');
 let dayBodies = document.getElementsByClassName('calendar-day');
@@ -32,3 +34,5 @@ for (let i=0; i<dayBodies.length; i++) {
 
 function eventClick(i) {
 }
+
+*/

@@ -1,7 +1,8 @@
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template import loader
 
-from .models import Question, Event
+from .models import Event
 from django.utils import timezone
 
 def index(request, date, view):
@@ -48,26 +49,23 @@ def index(request, date, view):
     else:
         return HttpResponse("Invalid view. Please use 'day', 'week', 'year', or 'month'.")
 
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    #latest_question_list = Question.objects.order_by("-pub_date")[:5]
 
 
-
-    # Temporary
-    first=list(event_list.keys())[0]
     template = loader.get_template("Calendar/index.html")
     context = {
-        "latest_question_list": latest_question_list,
+        #"latest_question_list": latest_question_list,
         "event_list": event_list,
-        "first": first,
     }
     return HttpResponse(template.render(context, request))
 
-
+"""
 def requestEventDateRange(date_begin, date_end):
     # Create object to store events
     event_list = {
-    #   "2024-01-01": [event1, event2, etc.],
-    #   "2024-01-02": [event1, event2, etc.],
+    #   "2024-01-01": [event1, event2, ...],
+    #   "2024-01-02": [event1, event2, ...],
+    #   ...
     }
 
     # Get all events between the two dates
@@ -79,7 +77,41 @@ def requestEventDateRange(date_begin, date_end):
         print("EVENTS:", events)
         event_list[event_date.strftime("%Y-%m-%d")] = events
     return event_list
+"""
+    
+def requestEventDateRange(date_begin, date_end):
+    event_list = []
+    for i in range((date_end - date_begin).days + 1):
+        event_date = date_begin + timezone.timedelta(days=i)
+        events = list(Event.objects.filter(event_date=event_date))
+        event_list.append({
+            'date': event_date.strftime("%Y-%m-%d"),
+            'weekday': event_date.strftime("%A"),
+            'events': events
+        })
+    return event_list
 
+
+
+def event_details_ajax(request, event_id):
+    # Get the event object by ID
+    event = Event.objects.filter(id=event_id).first()
+    print("EVENT:", event)
+
+    if event:
+        # Return event data as JSON
+        data = {
+            'name': event.event_name,
+            'description': event.event_description,
+            'event_date': event.event_date.strftime("%B %d, %Y"),  # Format the date
+        }
+        return JsonResponse(data)
+    else:
+        return JsonResponse({'error': 'Event not found'}, status=404)
+
+
+
+"""
 
 def detail(request, question_id):
     return HttpResponse("You're looking at question %s." % question_id)
@@ -92,3 +124,5 @@ def results(request, question_id):
 
 def vote(request, question_id):
     return HttpResponse("You're voting on question %s." % question_id)
+
+"""
