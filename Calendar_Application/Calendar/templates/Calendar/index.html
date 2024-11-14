@@ -10,9 +10,12 @@
 <body>
     <div class="calendar">
         <div class="calendar-header">
-            <button id="prev-month">Prev</button>
-            <h2 id="month-year">{{ event_list.0.date }} FIX THIS</h2>
-            <button id="next-month">Next</button>
+            <button id="prev-week">Prev</button>
+            <h2 id="month-year" data-current-date="{{ event_list.0.date }}">
+                Week of {{ event_list.0.date|date:"F j, Y" }}
+            </h2>
+            
+            <button id="next-week">Next</button>
         </div>
 
         <div class="calendar-grid">
@@ -83,6 +86,31 @@
                 document.getElementById('event-modal').style.display = 'none';
             }
         });
+
+        document.querySelector('#prev-week').addEventListener('click', function() {
+            navigateToWeek(-1);  // Go to previous week
+        });
+
+        document.querySelector('#next-week').addEventListener('click', function() {
+            navigateToWeek(1);  // Go to next week
+        });
+
+        function navigateToWeek(offset) {
+            // Get the current date from the heading or data attribute
+            const currentDateText = document.getElementById('month-year').dataset.currentDate; // Assuming you pass this date as a data attribute
+            const currentDate = new Date(currentDateText);
+
+            // Calculate the new date
+            const newDate = new Date(currentDate);
+            newDate.setDate(currentDate.getDate() + offset * 7);
+
+            // Format the new date to YYYY-MM-DD (start of the week)
+            const newDateStr = newDate.toISOString().split('T')[0];
+
+            // Redirect to the new week view
+            window.location.href = `/Calendar/${newDateStr}/week`;
+        }
+
     </script>
 </body>
 </html>
