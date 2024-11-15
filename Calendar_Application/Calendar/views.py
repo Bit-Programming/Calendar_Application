@@ -8,79 +8,31 @@ from django.template import loader
 from .models import Event
 from django.utils import timezone
 
-def index(request, date, view):
-    if view == "year":
-        # Make sure date only contains a year
-        try:
-            date = timezone.datetime.strptime(date, "%Y")
-        except:
-            return HttpResponse("Invalid date format. Please use the format YYYY.")
-        
-        # Don't need to check for events if we're looking at a year
 
-        # Temporary bc it looks cool
-        event_list = requestEventDateRange(date, date + timedelta(days=365))
-    elif view == "month":
-        # Make sure date only contains a year and month day is optional
-        try:
-            date = timezone.datetime.strptime(date, "%Y-%m")
-        except:
-            try:
-                date = timezone.datetime.strptime(date, "%Y-%m-%d")
-            except:
-                return HttpResponse("Invalid date format. Please use the format YYYY-MM or YYYY-MM-DD.")
-        
+# CONSTANTS
 
-        # Only need to check for 1 event per day if we're looking at a month
-        first_day_of_month = date.replace(day=1)
-        # Calculate the last day of the month
-        if date.month == 12:
-            last_day_of_month = date.replace(year=date.year + 1, month=1, day=1) - timedelta(days=1)
-        else:
-            last_day_of_month = date.replace(month=date.month + 1, day=1) - timedelta(days=1)
+# Constants for views
+VIEW_YEAR = "year"
+VIEW_MONTH = "month"
+VIEW_WEEK = "week"
+VIEW_DAY = "day"
 
-        # Find the start of the week for the first day of the month (Sunday)
-        start_of_week = first_day_of_month - timedelta(days=first_day_of_month.weekday() + 1)  # Adjust to Sunday
-        
-        # Fetch events for the entire month including surrounding days for the view
-        event_list = requestEventDateRange(start_of_week, last_day_of_month + timedelta(days=(6 - last_day_of_month.weekday())))
+DATE_FORMATS = {
+    VIEW_YEAR: "%Y",
+    VIEW_MONTH: "%Y-%m",
+    VIEW_WEEK: "%Y-%m-%d",
+    VIEW_DAY: "%Y-%m-%d",
+}
 
-        # NOTE: HIDE EXTRA DAYS OF THE WEEK THAT ARE STILL SHOWN AT THE END OF THE MONTH ON A NEW LINE
+def parse_date(date_str, view):
+    # Parse date string based on view and return a date object or None.
+    try:
+        return timezone.datetime.strptime(date_str, DATE_FORMATS[view])
+    except (ValueError, KeyError):
+        return None
 
-    elif view == "week":
-        try:
-            # Parse date
-            date = timezone.datetime.strptime(date, "%Y-%m-%d")
-
-            # Find the Sunday before the date and make sunday displayed as the first day of the week
-            date = date - timedelta(days=(date.weekday() + 1) % 7)
-
-        except ValueError:
-            return HttpResponse("Invalid date format. Please use YYYY-MM-DD for weeks.")
-
-        # Show all events for the week
-        event_list = requestEventDateRange(date, date + timedelta(days=6))
-    elif view == "day":
-        # Make sure date only contains a year, month, and day
-        try:
-            date = timezone.datetime.strptime(date, "%Y-%m-%d")
-        except:
-            return HttpResponse("Invalid date format. Please use the format YYYY-MM-DD.")
-        
-        # Show all events for the day
-        event_list = requestEventDateRange(date, date)
-        
-    else:
-        return HttpResponse("Invalid view. Please use 'day', 'week', 'year', or 'month'.")
-
-
-    template = loader.get_template("Calendar/index.html")
-    context = {
-        "event_list": event_list,
-    }
-    return HttpResponse(template.render(context, request))
-    
-def requestEventDateRange(date_begin, date_end):
+def request_event_date_range(date_begin, date_end):
+    # Fetch all events between date_begin and date_end
     event_list = []
     for i in range((date_end - date_begin).days + 1):
         event_date = date_begin + timezone.timedelta(days=i)
@@ -93,6 +45,51 @@ def requestEventDateRange(date_begin, date_end):
     return event_list
 
 
+def index(request, date, view):
+    date_obj = parse_date(date, view)
+    if not date_obj:
+        return HttpResponse("Invalid date format. Please use the correct format.")
+
+    if view == VIEW_YEAR:
+        # Don't need to check for events if we're looking at a year but doing it temporarily bc it looks cool
+
+        # Account for leapyears when calculating the end date
+        date_start = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7)
+        date_end = date_obj + (timedelta(days=366) if (date_obj.year % 4 == 0 and (date_obj.year % 100 != 0 or date_obj.year % 400 == 0)) else timedelta(days=365))
+
+        event_list = request_event_date_range(date_start, date_end)
+    elif view == VIEW_MONTH:
+        date_end = date_obj.replace(day=1) + timedelta(days=31)
+        date_end = date_end.replace(day=1) - timedelta(days=1)
+        first_day_of_week = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7)
+        last_day_of_week = date_end + timedelta(days=6 - date_end.weekday())
+        event_list = request_event_date_range(first_day_of_week, last_day_of_week)
+        # TODO: Only need to check for 1 event per day if we're looking at a month
+    elif view == "week":
+        start_of_week = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7) # Results in overflow error when year is 1 on January 1st
+        event_list = request_event_date_range(start_of_week, start_of_week + timedelta(days=6))
+    elif view == "day":
+        event_list = request_event_date_range(date_obj, date_obj)
+    else:
+        return HttpResponse("Invalid view. Please use 'day', 'week', 'year', or 'month'.")
+
+
+    title_text = {
+        VIEW_YEAR: date_obj.strftime("%Y"),
+        VIEW_MONTH: date_obj.strftime("%B %Y"),
+        VIEW_WEEK: "Week of " + date_obj.strftime("%B %d, %Y"),
+        VIEW_DAY: date_obj.strftime("%B %d, %Y")
+    }.get(view)
+
+    template = loader.get_template("Calendar/index.html")
+    context = {
+        "event_list": event_list,
+        "title_text": title_text,
+        "view": view,
+    }
+    return HttpResponse(template.render(context, request))
+
+
 
 def event_details_ajax(request, event_id):
     # Get the event object by ID
@@ -103,23 +100,8 @@ def event_details_ajax(request, event_id):
         data = {
             'name': event.event_name,
             'description': event.event_description,
-            'event_date': event.event_date.strftime("%B %d, %Y"),  # Format the date
+            'event_date': event.event_date.strftime("%B %d, %Y"),
         }
         return JsonResponse(data)
     else:
         return JsonResponse({'error': 'Event not found'}, status=404)
-
-
-"""
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-
-
-def results(request, question_id):  
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
-
-
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
-"""

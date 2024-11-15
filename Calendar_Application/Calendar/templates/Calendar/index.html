@@ -10,12 +10,9 @@
 <body>
     <div class="calendar">
         <div class="calendar-header">
-            <button id="prev-week">Prev</button>
-            <h2 id="month-year" data-current-date="{{ event_list.0.date }}">
-                Week of {{ event_list.0.date|date:"F j, Y" }}
-            </h2>
-            
-            <button id="next-week">Next</button>
+            <button id="prev" aria-label="Previous">Prev</button>
+            <h2 id="heading" data-view="{{ view }}" data-current-date="{{ event_list.0.date }}">{{ event_list.0.date }}</h2>
+            <button id="next" aria-label="Next">Next</button>
         </div>
 
         <div class="calendar-grid">
@@ -24,7 +21,9 @@
                     <div class="day-name">{{ day.weekday }} <i>({{ day.date }})</i></div>
                     <div class="calendar-day">
                         {% for event in day.events %}
-                            <p class="event" data-event-id="{{ event.id }}"><b>{{ event }}</b></p> <!-- Assuming Event has a 'name' field -->
+                            <p class="event" data-event-id="{{ event.id }}" style="background-color: {{ event.event_color }};">
+                                <b>{{ event.event_name }}</b>
+                            </p>
                         {% empty %}
                             <p><i>No events</i></p>
                         {% endfor %}
@@ -33,84 +32,17 @@
             {% endfor %}
         </div>
     </div>
-    <script src="{% static 'calendar.js' %}" data-event-list="{{ event_list }}"></script>
 
-
-    <!-- Modal for event details -->
-    <div id="event-modal" class="modal">
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
+            <button class="close-btn" aria-label="Close">&times;</button>
             <h2 id="event-name"></h2>
             <p><strong>Date:</strong> <span id="event-date"></span></p>
             <p><strong>Description:</strong> <span id="event-description"></span></p>
         </div>
     </div>
 
-    <script>
-        // Event listener to open modal
-        document.querySelectorAll('.event').forEach(function(link) {
-            link.addEventListener('click', function(event) {
-                var eventId = this.getAttribute('data-event-id');
-                console.log("Event ID: ", eventId);
-                
-                // Make an AJAX request to get event details
-                fetch(`/Calendar/event/ajax/${eventId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert('Error: ' + data.error);
-                        } else {
-                            // Populate modal with event details
-                            document.getElementById('event-name').innerText = data.name;
-                            document.getElementById('event-date').innerText = data.event_date;
-                            document.getElementById('event-description').innerText = data.description;
-
-                            // Show the modal
-                            document.getElementById('event-modal').style.display = 'block';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching event details:', error);
-                    });
-            });
-        });
-
-        // Close the modal
-        document.querySelector('.close-btn').addEventListener('click', function() {
-            document.getElementById('event-modal').style.display = 'none';
-        });
-
-        // Close modal if clicked outside the content area
-        window.addEventListener('click', function(event) {
-            if (event.target === document.getElementById('event-modal')) {
-                document.getElementById('event-modal').style.display = 'none';
-            }
-        });
-
-        document.querySelector('#prev-week').addEventListener('click', function() {
-            navigateToWeek(-1);  // Go to previous week
-        });
-
-        document.querySelector('#next-week').addEventListener('click', function() {
-            navigateToWeek(1);  // Go to next week
-        });
-
-        function navigateToWeek(offset) {
-            // Get the current date from the heading or data attribute
-            const currentDateText = document.getElementById('month-year').dataset.currentDate; // Assuming you pass this date as a data attribute
-            const currentDate = new Date(currentDateText);
-
-            // Calculate the new date
-            const newDate = new Date(currentDate);
-            newDate.setDate(currentDate.getDate() + offset * 7);
-
-            // Format the new date to YYYY-MM-DD (start of the week)
-            const newDateStr = newDate.toISOString().split('T')[0];
-
-            // Redirect to the new week view
-            window.location.href = `/Calendar/${newDateStr}/week`;
-        }
-
-    </script>
+    <script src="{% static 'calendar.js' %}"></script>
 </body>
 </html>
