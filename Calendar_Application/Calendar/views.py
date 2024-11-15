@@ -47,10 +47,15 @@ def request_event_date_range(date_begin, date_end):
 
 def index(request, date, view):
     date_obj = parse_date(date, view)
+
+    first_day_of_view = date
+
     if not date_obj:
         return HttpResponse("Invalid date format. Please use the correct format.")
 
     if view == VIEW_YEAR:
+        # Sketch but works for now
+        first_day_of_view = (date_obj + timedelta(days=7)).strftime("%Y-01-01")
         # Don't need to check for events if we're looking at a year but doing it temporarily bc it looks cool
 
         # Account for leapyears when calculating the end date
@@ -59,16 +64,19 @@ def index(request, date, view):
 
         event_list = request_event_date_range(date_start, date_end)
     elif view == VIEW_MONTH:
+        # Sketch but works for now
+        first_day_of_view = (date_obj + timedelta(days=7)).strftime("%Y-%m-01")
         date_end = date_obj.replace(day=1) + timedelta(days=31)
         date_end = date_end.replace(day=1) - timedelta(days=1)
-        first_day_of_week = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7)
-        last_day_of_week = date_end + timedelta(days=6 - date_end.weekday())
-        event_list = request_event_date_range(first_day_of_week, last_day_of_week)
+        date_start = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7)
+        date_end = date_end + timedelta(days=6 - date_end.weekday())
+        event_list = request_event_date_range(date_start, date_end)
         # TODO: Only need to check for 1 event per day if we're looking at a month
-    elif view == "week":
-        start_of_week = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7) # Results in overflow error when year is 1 on January 1st
-        event_list = request_event_date_range(start_of_week, start_of_week + timedelta(days=6))
-    elif view == "day":
+    elif view == VIEW_WEEK:
+        date_start = date_obj - timedelta(days=(date_obj.weekday() + 1) % 7) # Results in overflow error when year is 1 on January 1st
+        event_list = request_event_date_range(date_start, date_start + timedelta(days=6))
+    elif view == VIEW_DAY:
+        date_start = date_obj
         event_list = request_event_date_range(date_obj, date_obj)
     else:
         return HttpResponse("Invalid view. Please use 'day', 'week', 'year', or 'month'.")
@@ -81,11 +89,14 @@ def index(request, date, view):
         VIEW_DAY: date_obj.strftime("%B %d, %Y")
     }.get(view)
 
+    print("date_start: ", first_day_of_view)
     template = loader.get_template("Calendar/index.html")
     context = {
         "event_list": event_list,
         "title_text": title_text,
+        "date": date,
         "view": view,
+        "first_day_of_view": first_day_of_view,
     }
     return HttpResponse(template.render(context, request))
 

@@ -7,11 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function navigateToDate(offset) {
         const currentDate = new Date(document.getElementById('heading').dataset.currentDate);
-        console.log("date: ", document.getElementById('heading').dataset.currentDate);
+        console.log(currentDate);
         const viewType = document.getElementById('heading').dataset.view;
 
         let newDate = new Date(currentDate);
-        console.log(newDate);
 
         let newDateStr = '';
 
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'month':
                 newDate.setMonth(currentDate.getMonth() + offset);
                 newDateStr = newDate.toISOString().split('-')[0] + '-' + newDate.toISOString().split('-')[1];
-                console.log(newDateStr);
                 break;
             case 'year':
                 newDate.setFullYear(currentDate.getFullYear() + offset);
@@ -35,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
         }
 
-        console.log(newDate);
+        console.log("newDate:", newDate);
+        console.log("newDateStr:", newDateStr);
         
         //window.location.href = `/Calendar/${newDateStr}/${viewType}`;
     }
