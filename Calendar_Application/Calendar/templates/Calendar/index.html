@@ -9,6 +9,7 @@
 </head>
 <body>
     <div class="calendar">
+        {% load tz %}
         <div class="calendar-header">
             <button id="prev" aria-label="Previous">Prev</button>
             <h2 id="heading" data-view="{{ view }}" data-current-date="{{ first_day_of_view }}">{{ title_text }}</h2>

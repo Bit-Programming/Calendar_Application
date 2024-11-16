@@ -5,9 +5,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevButton = document.getElementById('prev');
     const nextButton = document.getElementById('next');
 
+    function convertTZ(date, tzString) {
+        return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+    }
+    
     function navigateToDate(offset) {
-        const currentDate = new Date(document.getElementById('heading').dataset.currentDate);
-        console.log(currentDate);
+        console.log("value", document.getElementById('heading').dataset.currentDate)
+        // Sketchy
+        const currentDate = new Date(new Date(document.getElementById('heading').dataset.currentDate).toLocaleString('en', {timeZone: 'UTC'}));
+        
+
+        console.log("currentDate", currentDate);
         const viewType = document.getElementById('heading').dataset.view;
 
         let newDate = new Date(currentDate);
@@ -36,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("newDate:", newDate);
         console.log("newDateStr:", newDateStr);
         
-        //window.location.href = `/Calendar/${newDateStr}/${viewType}`;
+        window.location.href = `/Calendar/${newDateStr}/${viewType}`;
     }
 
 
