@@ -21,6 +21,7 @@ class Event(models.Model):
     event_end_time = models.TimeField("Event End Time")
     event_name = models.CharField(max_length=200)
     event_description = models.TextField()
+    event_place = models.CharField(max_length=200, default="")
     event_color = models.CharField(
         max_length=15,
         choices=Colors.choices,

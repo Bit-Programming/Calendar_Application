@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('event-name').textContent = data.name;
                         document.getElementById('event-date').textContent = data.event_date;
                         document.getElementById('event-description').textContent = data.description;
+                        document.getElementById('event-start-time').textContent = data.start_time;
+                        document.getElementById('event-end-time').textContent = data.end_time;
+                        document.getElementById('event-location').textContent = data.place;
+                        document.getElementById('event-color').textContent = data.color;
                         modal.style.display = 'flex';
                     }
                 })

@@ -140,6 +140,9 @@ def event_details_ajax(request, event_id):
             'name': event.event_name,
             'description': event.event_description,
             'event_date': event.event_date.strftime("%B %d, %Y"),
+            'start_time': event.event_start_time,
+            'end_time': event.event_end_time,
+            'place': event.event_place,
             'color': event.event_color,
         }
         return JsonResponse(data)
