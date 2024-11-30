@@ -8,6 +8,10 @@ from django.template import loader
 from .models import Event
 from django.utils import timezone
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+from django.shortcuts import get_list_or_404
 
 # CONSTANTS
 
@@ -23,6 +27,36 @@ DATE_FORMATS = {
     VIEW_WEEK: "%Y-%m-%d",
     VIEW_DAY: "%Y-%m-%d",
 }
+
+
+@csrf_exempt
+def add_event(request):
+    if request.method == 'POST':
+        try:
+            event_name = request.POST['event_name']
+            event_date = request.POST['event_date']
+            start_time = request.POST['start_time']
+            end_time = request.POST['end_time']
+            description = request.POST.get('description', '')
+            place = request.POST.get('place', '')
+            color = request.POST.get('event_color', '#496DDB')
+
+            # Create the event
+            new_event = Event.objects.create(
+                event_date=event_date,
+                event_start_time=start_time,
+                event_end_time=end_time,
+                event_name=event_name,
+                event_description=description,
+                event_place=place,
+                event_color=color
+            )
+            new_event.save()
+            return JsonResponse({'success': True, 'message': 'Event created successfully.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
 
 def parse_date(date_str, view):
     # Parse date string based on view and return a date object or None.
@@ -44,6 +78,17 @@ def request_event_date_range(date_begin, date_end):
         })
     return event_list
 
+def events_for_date(request, date):
+    events = get_list_or_404(Event, event_date=date)
+    event_data = [{
+        'name': event.event_name,
+        'description': event.event_description,
+        'start_time': event.event_start_time,
+        'end_time': event.event_end_time,
+        'place': event.event_place,
+        'color': event.event_color,
+    } for event in events]
+    return JsonResponse({'events': event_data})
 
 def index(request, date, view):
 

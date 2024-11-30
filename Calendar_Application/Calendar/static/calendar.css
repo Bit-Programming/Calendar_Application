@@ -36,9 +36,6 @@ p {
     border-radius: 12px;
     overflow: hidden;
     /*Fix height*/
-    
-    
-    animation: load 0.5s ease-out;
 }
 
 .calendar-header {
@@ -65,7 +62,7 @@ p {
     padding: 0;
 }
 
-.day-name {
+.day-heading {
     font: 0.9em;
     font-weight: bold;
     text-align: center;
@@ -74,6 +71,10 @@ p {
     white-space: nowrap;
     text-overflow: ellipsis;
     color: black;
+}
+
+.day-name {
+    color: white;
 }
 
 .calendar-day {
@@ -202,17 +203,5 @@ button:hover {
     100% {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-
-@keyframes load {
-    0% {
-        opacity: 0;
-        transform: translateY(-100px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0px);
     }
 }

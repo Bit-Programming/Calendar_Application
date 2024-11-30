@@ -1,9 +1,68 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const eventElements = document.querySelectorAll('.event');
+    const days = document.querySelectorAll('.calendar-day');
+    const addEventButton = document.getElementById('add-event-btn');
+    const addEventForm = document.getElementById('add-event-form');
+
     const modal = document.getElementById('event-modal');
-    const closeBtn = document.querySelector('.close-btn');
+    const closeEventBtn = document.querySelector('.close-event-btn');
+    const closeAddEventBtn = document.querySelector('.close-add-event-btn');
     const prevButton = document.getElementById('prev');
     const nextButton = document.getElementById('next');
+
+    days.forEach(day => {
+        day.addEventListener('click', function () {
+            const date = this.closest('.day').querySelector('.day-name').textContent.split('(')[1].split(')')[0];
+            document.getElementById('event-date').value = date;
+
+            // Fetch events for the clicked day
+            fetch(`/Calendar/event/ajax/date/${date}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        const eventList = document.getElementById('event-list');
+                        eventList.innerHTML = ''; // Clear previous events
+                        data.events.forEach(event => {
+                            const eventItem = document.createElement('p');
+                            eventItem.innerHTML = `<b>${event.name}</b><br><i>${event.start_time} - ${event.end_time}</i><br>${event.description}`;
+                            eventList.appendChild(eventItem);
+                        });
+                        modal.style.display = 'flex';
+                    }
+                });
+        });
+    });
+
+    addEventButton.addEventListener('click', () => addEventForm.style.display = 'flex');
+    closeAddEventBtn.addEventListener('click', () => addEventForm.style.display = 'none');
+    closeEventBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+        if (e.target === addEventForm) addEventForm.style.display = 'none';
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    addEventForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/Calendar/event/add/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Event added successfully!');
+                location.reload(); // Reload to display the new event
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    });
+
 
     function convertTZ(date, tzString) {
         return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
@@ -51,31 +110,4 @@ document.addEventListener('DOMContentLoaded', function () {
     prevButton.addEventListener('click', () => navigateToDate(-1));
     nextButton.addEventListener('click', () => navigateToDate(1));
 
-    eventElements.forEach(function (eventElement) {
-        eventElement.addEventListener('click', function () {
-            const eventId = this.dataset.eventId;
-            fetch(`/Calendar/event/ajax/${eventId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert('Error: ' + data.error);
-                    } else {
-                        document.getElementById('event-name').textContent = data.name;
-                        document.getElementById('event-date').textContent = data.event_date;
-                        document.getElementById('event-description').textContent = data.description;
-                        document.getElementById('event-start-time').textContent = data.start_time;
-                        document.getElementById('event-end-time').textContent = data.end_time;
-                        document.getElementById('event-location').textContent = data.place;
-                        document.getElementById('event-color').textContent = data.color;
-                        modal.style.display = 'flex';
-                    }
-                })
-                .catch(console.error);
-        });
-    });
-
-    closeBtn.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
 });

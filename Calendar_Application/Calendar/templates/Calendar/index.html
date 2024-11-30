@@ -19,10 +19,10 @@
         <div class="calendar-grid">
             {% for day in event_list %}
                 <div class="day">
-                    <div class="day-name"><a href="d">{{ day.weekday }} <i>({{ day.date }})</i></a></div>
+                    <div class="day-heading"><a class="day-name" href="/Calendar/{{ day.date }}/day">{{ day.weekday }} <i>({{ day.date }})</i></a></div>
                     <div class="calendar-day">
                         {% for event in day.events %}
-                            <p class="event" data-event-id="{{ event.id }}" style="background-color: {{ event.event_color }};">
+                            <p class="event" data-event-id="{{ event.id }}" style="background-color: {{ event.event_color }}">
                                 <b>{{ event.event_name }}</b><br><i>{{ event.event_start_time }} - {{ event.event_end_time }}</i>
                             </p>
                         {% empty %}
@@ -37,14 +37,45 @@
     <!-- Event Modal -->
     <div id="event-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content">
-            <button class="close-btn" aria-label="Close">&times;</button>
-            <h2 id="event-name"></h2>
-            <p><strong>Date:</strong> <span id="event-date"></span></p>
-            <p><strong>Description:</strong> <span id="event-description"></span></p>
-            <p><strong>Start Time:</strong> <span id="event-start-time"></span></p>
-            <p><strong>End Time:</strong> <span id="event-end-time"></span></p>
-            <p><strong>Location:</strong> <span id="event-location"></span></p>
-            <p><strong>Color:</strong> <span id="event-color"></span></p>
+            <button class="close-event-btn" aria-label="Close">&times;</button>
+            <h2>Events</h2>
+            <div id="event-list"></div>
+            <button id="add-event-btn">Add Event</button>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="add-event-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="close-add-event-btn" aria-label="Close">&times;</button>
+            <h2>Add Event</h2>
+            <form id="add-event-form">
+                {% csrf_token %}
+                <label for="event-name">Event Name:</label>
+                <input type="text" id="event-name" name="event_name" required>
+                <label for="event-date">Date:</label>
+                <input type="date" id="event-date" name="event_date" required>
+                <label for="event-start-time">Start Time:</label>
+                <input type="time" id="event-start-time" name="start_time" required>
+                <label for="event-end-time">End Time:</label>
+                <input type="time" id="event-end-time" name="end_time" required>
+                <label for="event-description">Description:</label>
+                <textarea id="event-description" name="description"></textarea>
+                <label for="event-location">Location:</label>
+                <input type="text" id="event-location" name="place">
+                <label for="event-color">Color:</label>
+                <select id="event-color" name="event_color">
+                    <option value="#f2002b">Red</option>
+                    <option value="#F64021">Red-Orange</option>
+                    <option value="#F98016">Orange</option>
+                    <option value="#FCC00B">Orange-Yellow</option>
+                    <option value="#FFFF00">Yellow</option>
+                    <option value="#00CC66">Green</option>
+                    <option value="#496DDB">Blue</option>
+                    <option value="#7209B7">Purple</option>
+                    <option value="#A01A7D">Magenta</option>
+                </select>
+            </form>
         </div>
     </div>
 
