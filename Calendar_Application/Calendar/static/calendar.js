@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const days = document.querySelectorAll('.calendar-day');
     const addEventButton = document.getElementById('add-event-btn');
-    const addEventForm = document.getElementById('add-event-form');
+    const addEventModal = document.getElementById('add-event-modal');
 
     const modal = document.getElementById('event-modal');
     const closeEventBtn = document.querySelector('.close-event-btn');
@@ -13,38 +13,55 @@ document.addEventListener('DOMContentLoaded', function () {
         day.addEventListener('click', function () {
             const date = this.closest('.day').querySelector('.day-name').textContent.split('(')[1].split(')')[0];
             document.getElementById('event-date').value = date;
-
+    
             // Fetch events for the clicked day
             fetch(`/Calendar/event/ajax/date/${date}/`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // If the response status is not OK, return a simulated error response
+                        return { error: `HTTP error! Status: ${response.status}` };
+                    }
+                    return response.json(); // Parse JSON only if the response is OK
+                })
                 .then(data => {
+                    const eventList = document.getElementById('event-list');
+                    eventList.innerHTML = ''; // Clear previous events
+                    
                     if (data.error) {
-                        alert('Error: ' + data.error);
+                        // Show "No events" if there's an error or events are missing
+                        eventList.innerHTML = '<p>No events</p>';
                     } else {
-                        const eventList = document.getElementById('event-list');
-                        eventList.innerHTML = ''; // Clear previous events
+                        // Populate the event list if there are events
                         data.events.forEach(event => {
                             const eventItem = document.createElement('p');
                             eventItem.innerHTML = `<b>${event.name}</b><br><i>${event.start_time} - ${event.end_time}</i><br>${event.description}`;
                             eventList.appendChild(eventItem);
                         });
-                        modal.style.display = 'flex';
                     }
+                    // Show the modal
+                    modal.style.display = 'flex';
+                })
+                .catch(() => {
+                    // Handle unexpected fetch errors gracefully without logging
+                    const eventList = document.getElementById('event-list');
+                    eventList.innerHTML = '<p>No events</p>';
+                    modal.style.display = 'flex';
                 });
         });
     });
+    
 
-    addEventButton.addEventListener('click', () => addEventForm.style.display = 'flex');
-    closeAddEventBtn.addEventListener('click', () => addEventForm.style.display = 'none');
+    addEventButton.addEventListener('click', () => addEventModal.style.display = 'flex');
+    closeAddEventBtn.addEventListener('click', () => addEventModal.style.display = 'none');
     closeEventBtn.addEventListener('click', () => modal.style.display = 'none');
     window.addEventListener('click', (e) => {
-        if (e.target === addEventForm) addEventForm.style.display = 'none';
+        if (e.target === addEventModal) addEventModal.style.display = 'none';
         if (e.target === modal) modal.style.display = 'none';
     });
 
-    addEventForm.addEventListener('submit', function (e) {
+    addEventModal.addEventListener('submit', function (e) {
         e.preventDefault();
-        const formData = new FormData(this);
+        const formData = new FormData(document.getElementById('add-event-form'));
         fetch('/Calendar/event/add/', {
             method: 'POST',
             body: formData,
