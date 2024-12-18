@@ -51,29 +51,29 @@
             <h2>Add Event</h2>
             <form id="add-event-form">
                 {% csrf_token %}
-                <label for="event-name">Event Name:</label>
+                <label>Event Name:</label>
                 <input type="text" id="event-name" name="event_name" required>
-                <label for="event-date">Date:</label>
+                <label>Date:</label>
                 <input type="date" id="event-date" name="event_date" required>
-                <label for="event-start-time">Start Time:</label>
+                <label>Start Time:</label>
                 <input type="time" id="event-start-time" name="start_time" required>
-                <label for="event-end-time">End Time:</label>
+                <label>End Time:</label>
                 <input type="time" id="event-end-time" name="end_time" required>
-                <label for="event-description">Description:</label>
-                <textarea id="event-description" name="description"></textarea>
-                <label for="event-location">Location:</label>
+                <label>Description:</label>
+                <input id="event-description" name="description"></input>
+                <label>Location:</label>
                 <input type="text" id="event-location" name="place">
-                <label for="event-color">Color:</label>
+                <label>Color:</label>
                 <select id="event-color" name="event_color">
-                    <option value="#f2002b">Red</option>
-                    <option value="#F64021">Red-Orange</option>
-                    <option value="#F98016">Orange</option>
-                    <option value="#FCC00B">Orange-Yellow</option>
-                    <option value="#FFFF00">Yellow</option>
-                    <option value="#00CC66">Green</option>
-                    <option value="#496DDB">Blue</option>
-                    <option value="#7209B7">Purple</option>
-                    <option value="#A01A7D">Magenta</option>
+                    <option value="#f2002b" data-color="#f2002b">Red</option>
+                    <option value="#F64021" data-color="#F64021">Red-Orange</option>
+                    <option value="#F98016" data-color="#F98016">Orange</option>
+                    <option value="#FCC00B" data-color="#FCC00B">Orange-Yellow</option>
+                    <option value="#FFFF00" data-color="#FFFF00">Yellow</option>
+                    <option value="#00CC66" data-color="#00CC66">Green</option>
+                    <option value="#496DDB" data-color="#496DDB">Blue</option>
+                    <option value="#7209B7" data-color="#7209B7">Purple</option>
+                    <option value="#A01A7D" data-color="#A01A7D">Magenta</option>
                 </select>
                 <button type="submit">Add Event</button>
             </form>

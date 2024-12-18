@@ -113,7 +113,7 @@ button {
 
 button:hover {
     background-color: #4c4c4c;
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 .event {
@@ -194,6 +194,32 @@ button:hover {
     color: #333;
 }
 
+
+#add-event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#add-event-form input, select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+#add-event-form input:hover, select:hover {
+    transform: scale(1.01);
+}
+
+#add-event-form button {
+    transition: all 0.3s;
+}
+
+#add-event-form button:hover {
+    background-color: #4c4c4c;
+    transform: scale(1.01);
+}
 
 @keyframes fadeScale {
     0% {

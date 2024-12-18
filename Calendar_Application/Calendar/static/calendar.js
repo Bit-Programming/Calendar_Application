@@ -49,6 +49,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         });
     });
+
+    const eventColorSelect = document.getElementById('event-color');
+
+    function updateSelectColor() {
+        const selectedOption = eventColorSelect.options[eventColorSelect.selectedIndex];
+        const selectedColor = selectedOption.getAttribute('data-color');
+
+        eventColorSelect.style.backgroundImage = `linear-gradient(to right, ${selectedColor} 0%, ${selectedColor} 15px, transparent 15px, transparent 100%)`;
+        eventColorSelect.style.backgroundRepeat = 'no-repeat';
+        eventColorSelect.style.backgroundPosition = 'left center';
+        eventColorSelect.style.backgroundSize = '100% 100%';
+        eventColorSelect.style.paddingLeft = '20px'; // Adjust padding if necessary
+    }
+
+    // Set the initial color
+    updateSelectColor();
+
+    // Update color on change
+    eventColorSelect.addEventListener('change', updateSelectColor);
     
 
     addEventButton.addEventListener('click', () => addEventModal.style.display = 'flex');
@@ -72,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Event added successfully!');
                 location.reload(); // Reload to display the new event
             } else {
                 alert('Error: ' + data.error);
