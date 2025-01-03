@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     days.forEach(day => {
         day.addEventListener('click', function () {
             const date = this.closest('.day').querySelector('.day-name').textContent.split('(')[1].split(')')[0];
+            const eventList = document.getElementById('event-list');
             document.getElementById('event-date').value = date;
     
             // Fetch events for the clicked day
@@ -24,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     return response.json(); // Parse JSON only if the response is OK
                 })
                 .then(data => {
-                    const eventList = document.getElementById('event-list');
                     eventList.innerHTML = ''; // Clear previous events
                     
                     if (data.error) {
@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(() => {
                     // Handle unexpected fetch errors gracefully without logging
-                    const eventList = document.getElementById('event-list');
                     eventList.innerHTML = '<p>No events</p>';
                     modal.style.display = 'flex';
                 });
