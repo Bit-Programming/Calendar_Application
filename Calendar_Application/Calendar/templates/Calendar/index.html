@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="{% static 'calendar.css' %}">
 </head>
 <body>
+    <div class="find">
+        <form id="find" method="post">
+            {% csrf_token %}
+            <label for="date">Go to date:</label>
+            <input type="date" id="date" name="date" required>
+            <label for="views">View:</label>
+            <select name="views" id="views">
+                <option value="year">Year</option>
+                <option value="month">Month</option>
+                <option value="week">Week</option>
+                <option value="day">Day</option>
+              </select>
+            <button type="submit">Find</button>
+        </form>
+    </div>
+    <br>
     <div class="calendar">
         {% load tz %}
         <div class="calendar-header">
