@@ -3,9 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day</title>
+    <title>Calendar</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'day.css' %}">
 </head>
 <body>
+    <div class="calendar">
+        {% load tz %}
+        <div class="calendar-header">
+            <button id="prev" aria-label="Previous">Prev</button>
+            <h2 id="heading" data-view="{{ view }}" data-current-date="{{ first_day_of_view }}">{{ title_text }}</h2>
+            <button id="next" aria-label="Next">Next</button>
+        </div>
+
+        <div class="calendar-grid">
+            {% for day in event_list %}
+                <div class="day">
+                    <div class="day-heading"><a class="day-name" href="/Calendar/{{ day.date }}/day">{{ day.weekday }} <i>({{ day.date }})</i></a></div>
+                    <div class="calendar-day">
+                        {% for event in day.events %}
+                            <p class="event" data-event-id="{{ event.id }}" style="background-color: {{ event.event_color }}">
+                                <b>{{ event.event_name }}</b><br><i>{{ event.event_start_time }} - {{ event.event_end_time }}</i>
+                            </p>
+                        {% empty %}
+                            <p><i>No events</i></p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- Event Modal -->
     <div id="event-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content">
@@ -51,6 +79,7 @@
             </form>
         </div>
     </div>
+
     <script src="{% static 'day.js' %}"></script>
 </body>
 </html>
