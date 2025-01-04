@@ -8,6 +8,18 @@
     <link rel="stylesheet" href="{% static 'day.css' %}">
 </head>
 <body>
+    <div class="find">
+        <label for="date">Go to date:</label>
+        <input type="date" id="find-date" name="date" required>
+        <label for="views">View:</label>
+        <select name="views" id="views">
+            <option value="year">Year</option>
+            <option value="month">Month</option>
+            <option value="week">Week</option>
+            <option value="day">Day</option>
+            </select>
+        <button id="find">Find</button>
+    </div>
     <div class="calendar">
         {% load tz %}
         <div class="calendar-header">
@@ -80,6 +92,6 @@
         </div>
     </div>
 
-    <script src="{% static 'day.js' %}"></script>
+    <script src="{% static 'calendar.js' %}"></script>
 </body>
 </html>

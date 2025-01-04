@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeAddEventBtn = document.querySelector('.close-add-event-btn');
     const prevButton = document.getElementById('prev');
     const nextButton = document.getElementById('next');
+    const findButton = document.getElementById('find');
 
     days.forEach(day => {
         day.addEventListener('click', function () {
@@ -144,4 +145,26 @@ document.addEventListener('DOMContentLoaded', function () {
     prevButton.addEventListener('click', () => navigateToDate(-1));
     nextButton.addEventListener('click', () => navigateToDate(1));
 
+
+    findButton.addEventListener('click', () => {
+        const date = document.getElementById('find-date').value;
+        const views = document.getElementById('views');
+        const viewType = views.options[views.selectedIndex].text;
+        console.log("date:", date);
+        console.log("viewType:", viewType);
+        
+        if (viewType === "Year") { // strip the year from the date
+            window.location.href = `/Calendar/${date.split('-')[0]}/year`;
+        }
+        else if (viewType === "Month") { // strip the year and month from the date
+            window.location.href = `/Calendar/${date.split('-')[0] + '-' + date.split('-')[1]}/month`;
+        }
+        else if (viewType === "Week") { // strip the year and month from the date
+            window.location.href = `/Calendar/${date.split('-')[0] + '-' + date.split('-')[1] + '-' + date.split('-')[2]}/week`;
+        }
+        else if (viewType === "Day") { // strip the year and month from the date
+            window.location.href = `/Calendar/${date}/day`;
+        }
+        
+    });
 });

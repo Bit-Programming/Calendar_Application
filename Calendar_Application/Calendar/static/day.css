@@ -2,6 +2,7 @@ body {
     background-color: lightgray;
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -23,6 +24,18 @@ body {
 
 p {
     color: black;
+}
+
+.find {
+    width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+    margin: 20px;
+    background: rgba(75, 75, 75, 0.3);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .calendar {
