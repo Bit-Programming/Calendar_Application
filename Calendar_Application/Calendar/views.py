@@ -57,6 +57,16 @@ def add_event(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
+@csrf_exempt
+def delete_event(request, event_id):
+    if request.method == 'DELETE':
+        try:
+            event = get_object_or_404(Event, pk=event_id)
+            event.delete()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request method."})
 
 def parse_date(date_str, view):
     # Parse date string based on view and return a date object or None.
@@ -189,6 +199,7 @@ def event_details_ajax(request, event_id):
             'end_time': event.event_end_time,
             'place': event.event_place,
             'color': event.event_color,
+            'id': event.pk
         }
         return JsonResponse(data)
     else:

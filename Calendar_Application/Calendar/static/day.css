@@ -22,6 +22,24 @@ body {
     color: #FFF;
 }
 
+#line {
+    background-color: darkgray;
+    height: 2px;
+}
+
+#line:last-of-type {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#delete-event-btn {
+    margin-bottom: 20px;
+}
+
+a {
+    color: white;
+}
+
 p {
     color: black;
 }

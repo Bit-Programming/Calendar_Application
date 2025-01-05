@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const viewType = document.getElementById('heading').dataset.view;
 
     const firstdate = document.getElementById('heading').dataset.currentDate;
-    console.log("viewtype:", viewType);
+
     document.getElementById('find-date').valueAsDate = new Date(firstdate);
+    document.getElementById('views').value = viewType;
 
     // Extract year out of date
     switch (viewType) {
@@ -60,8 +61,35 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Populate the event list if there are events
                         data.events.forEach(event => {
                             const eventItem = document.createElement('p');
+                            const deleteEventButton = document.createElement('button');
+                            const div = document.createElement('div');
+                            deleteEventButton.innerHTML = 'Delete Event';
+                            deleteEventButton.id = 'delete-event-btn';
+                            deleteEventButton.addEventListener('click', () => {
+                                console.log(event); // Check if 'id' is present
+                                fetch(`/Calendar/event/delete/${event.id}/`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        eventItem.remove();
+                                    } else {
+                                        alert('Error: ' + data.error);
+                                    }
+                                });
+                            });
                             eventItem.innerHTML = `<b>${event.name}</b><br><i>${event.start_time} - ${event.end_time}</i><br>${event.description}`;
-                            eventList.appendChild(eventItem);
+                            div.appendChild(eventItem);
+                            div.appendChild(deleteEventButton);
+                            // If event is last one, don't add a line
+                            if (data.events.indexOf(event) !== data.events.length - 1) {
+                                div.appendChild(document.createElement('hr'));
+                            }
+                            eventList.appendChild(div);
                         });
                     }
                     // Show the modal
