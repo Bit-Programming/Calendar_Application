@@ -61,8 +61,8 @@ def add_event(request):
 def delete_event(request, event_id):
     if request.method == 'DELETE':
         try:
-            event = get_object_or_404(Event, pk=event_id)
-            event.delete()
+            Event.objects.filter(id=event_id).delete()
+            
             return JsonResponse({"success": True})
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
@@ -97,6 +97,7 @@ def events_for_date(request, date):
         'end_time': event.event_end_time,
         'place': event.event_place,
         'color': event.event_color,
+        'id': event.pk
     } for event in events]
     return JsonResponse({'events': event_data})
 
@@ -198,8 +199,7 @@ def event_details_ajax(request, event_id):
             'start_time': event.event_start_time,
             'end_time': event.event_end_time,
             'place': event.event_place,
-            'color': event.event_color,
-            'id': event.pk
+            'color': event.event_color
         }
         return JsonResponse(data)
     else:

@@ -66,21 +66,24 @@ document.addEventListener('DOMContentLoaded', function () {
                             deleteEventButton.innerHTML = 'Delete Event';
                             deleteEventButton.id = 'delete-event-btn';
                             deleteEventButton.addEventListener('click', () => {
-                                console.log(event); // Check if 'id' is present
-                                fetch(`/Calendar/event/delete/${event.id}/`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                                    }
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        eventItem.remove();
-                                    } else {
-                                        alert('Error: ' + data.error);
-                                    }
-                                });
+                                if (confirm('Do you want to delete this event?')) {
+                                    console.log(event); // Check if 'id' is present
+                                    fetch(`/Calendar/event/delete/${event.id}/`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            div.remove();
+                                            location.reload(); // Reload to remove the deleted event
+                                        } else {
+                                            alert('Error: ' + data.error);
+                                        }
+                                    });
+                                }
                             });
                             eventItem.innerHTML = `<b>${event.name}</b><br><i>${event.start_time} - ${event.end_time}</i><br>${event.description}`;
                             div.appendChild(eventItem);
