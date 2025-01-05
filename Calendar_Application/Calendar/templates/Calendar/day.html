@@ -24,7 +24,7 @@
         {% load tz %}
         <div class="calendar-header">
             <button id="prev" aria-label="Previous">Prev</button>
-            <h2 id="heading" data-view="{{ view }}" data-current-date="{{ first_day_of_view }}">{{ title_text }}</h2>
+            <h2 id="heading" data-view="{{ view }}" data-current-date="{{ first_day_of_view }}"><a id="headingtext">{{ title_text }}</a></h2>
             <button id="next" aria-label="Next">Next</button>
         </div>
 

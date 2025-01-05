@@ -214,14 +214,14 @@ button:hover {
     gap: 10px;
 }
 
-#add-event-form input, select, #find input {
+#add-event-form input, select, .find input {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
     transition: all 0.3s;
 }
 
-#add-event-form input:hover, select:hover, #find input:hover {
+#add-event-form input:hover, select:hover, .find input:hover {
     transform: scale(1.01);
 }
 

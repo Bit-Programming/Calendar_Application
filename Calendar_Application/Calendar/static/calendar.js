@@ -10,11 +10,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextButton = document.getElementById('next');
     const findButton = document.getElementById('find');
 
+    const viewType = document.getElementById('heading').dataset.view;
+
+    const firstdate = document.getElementById('heading').dataset.currentDate;
+    console.log("viewtype:", viewType);
+    document.getElementById('find-date').valueAsDate = new Date(firstdate);
+
+    // Extract year out of date
+    switch (viewType) {
+        case 'month': {
+            document.getElementById('headingtext').href = "/Calendar/" + firstdate.split("-")[0] + "/year";
+            break;
+        }
+        case 'week': {
+            document.getElementById('headingtext').href = "/Calendar/" + firstdate.split("-")[0] + "-" + firstdate.split("-")[1] + "/month";
+            break;
+        }
+        case 'day': {
+            document.getElementById('headingtext').href = "/Calendar/" + firstdate + "/week";
+            break;
+        }
+    }
+    
+
     days.forEach(day => {
         day.addEventListener('click', function () {
             const date = this.closest('.day').querySelector('.day-name').textContent.split('(')[1].split(')')[0];
             const eventList = document.getElementById('event-list');
             document.getElementById('event-date').value = date;
+            console.log("date:", date);
+            document.getElementById('find-date').valueAsDate = new Date(date);
     
             // Fetch events for the clicked day
             fetch(`/Calendar/event/ajax/date/${date}/`)
@@ -110,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
 
         console.log("currentDate", currentDate);
-        const viewType = document.getElementById('heading').dataset.view;
 
         let newDate = new Date(currentDate);
 
