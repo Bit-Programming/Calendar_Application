@@ -62,7 +62,6 @@ def delete_event(request, event_id):
     if request.method == 'DELETE':
         try:
             Event.objects.filter(id=event_id).delete()
-            
             return JsonResponse({"success": True})
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
